@@ -30,15 +30,19 @@ public class EmployeeService {
                 .orElseThrow(EmployeeNotFoundException::new);
     }
 
-    public void update(Long id, Employee employee) {
+    public void update(Long id, EmployeeRequest employeeRequest) {
         Employee toBeUpdatedEmployee = employeeRepository.findById(id)
                 .orElseThrow(EmployeeNotFoundException::new);
-        if (employee.getSalary() != null) {
-            toBeUpdatedEmployee.setSalary(employee.getSalary());
+
+        // Update age and salary if provided
+        if (employeeRequest.getAge() != null) {
+            toBeUpdatedEmployee.setAge(employeeRequest.getAge());
         }
-        if (employee.getAge() != null) {
-            toBeUpdatedEmployee.setAge(employee.getAge());
+        if (employeeRequest.getSalary() != null) {
+            toBeUpdatedEmployee.setSalary(employeeRequest.getSalary());
         }
+
+        // Save the updated employee
         employeeRepository.save(toBeUpdatedEmployee);
     }
 

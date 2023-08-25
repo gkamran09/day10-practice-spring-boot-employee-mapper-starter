@@ -79,18 +79,23 @@ class EmployeeApiTest {
 
     @Test
     void should_update_employee_age_and_salary() throws Exception {
-        Employee previousEmployee = employeeRepository.save(new Employee(null,"Json", 22, "Male", 1000));
-        Employee employeeUpdateRequest = new Employee(previousEmployee.getId(), "lisi", 24, "Female", 2000);
+        Employee previousEmployee = employeeRepository.save(new Employee(null, "Json", 22, "Male", 1000));
+        EmployeeRequest employeeUpdateRequest = new EmployeeRequest("lisi", 24, "Female", 2000, null);
+
         ObjectMapper objectMapper = new ObjectMapper();
         String updatedEmployeeJson = objectMapper.writeValueAsString(employeeUpdateRequest);
+
         mockMvc.perform(put("/employees/{id}", previousEmployee.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedEmployeeJson))
+
                 .andExpect(MockMvcResultMatchers.status().is(204));
 
         Optional<Employee> optionalEmployee = employeeRepository.findById(previousEmployee.getId());
         assertTrue(optionalEmployee.isPresent());
         Employee updatedEmployee = optionalEmployee.get();
+
+
         Assertions.assertEquals(employeeUpdateRequest.getAge(), updatedEmployee.getAge());
         Assertions.assertEquals(employeeUpdateRequest.getSalary(), updatedEmployee.getSalary());
         Assertions.assertEquals(previousEmployee.getId(), updatedEmployee.getId());
