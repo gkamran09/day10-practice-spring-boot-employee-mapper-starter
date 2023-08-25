@@ -1,5 +1,6 @@
 package com.afs.restapi;
 
+import com.afs.restapi.dto.CompanyRequest;
 import com.afs.restapi.entity.Company;
 import com.afs.restapi.entity.Employee;
 import com.afs.restapi.repository.CompanyRepository;
@@ -95,15 +96,15 @@ class CompanyApiTest {
     @Test
     void should_create_company() throws Exception {
         Company company = getCompanyOOCL();
-
+        CompanyRequest companyRequest = new CompanyRequest("OOCL");
         ObjectMapper objectMapper = new ObjectMapper();
-        String companyRequest = objectMapper.writeValueAsString(company);
+        String companyRequester = objectMapper.writeValueAsString(company);
         mockMvc.perform(post("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(companyRequest))
+                        .content(companyRequester))
                 .andExpect(MockMvcResultMatchers.status().is(201))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(notNullValue()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(company.getName()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(companyRequest.getName()));
     }
 
     @Test

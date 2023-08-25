@@ -8,7 +8,6 @@ import org.springframework.beans.BeanUtils;
 public class EmployeeMapper {
 
     private EmployeeMapper() {
-
     }
 
     public static Employee toEntity(EmployeeRequest employeeRequest) {

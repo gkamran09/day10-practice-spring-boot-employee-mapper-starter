@@ -1,5 +1,7 @@
 package com.afs.restapi.controller;
 
+import com.afs.restapi.dto.CompanyRequest;
+import com.afs.restapi.dto.CompanyResponse;
 import com.afs.restapi.entity.Company;
 import com.afs.restapi.service.CompanyService;
 import com.afs.restapi.entity.Employee;
@@ -47,8 +49,8 @@ public class CompanyController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Company createCompany(@RequestBody Company company) {
-        return companyService.create(company);
+    public CompanyResponse createCompany(@RequestBody CompanyRequest companyRequest) {
+        return companyService.create(companyRequest);
     }
 
     @GetMapping("/{id}/employees")
