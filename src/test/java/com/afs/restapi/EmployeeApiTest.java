@@ -4,6 +4,7 @@ import com.afs.restapi.dto.EmployeeRequest;
 import com.afs.restapi.entity.Employee;
 import com.afs.restapi.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,15 +100,27 @@ class EmployeeApiTest {
 
     @Test
     void should_find_employee_by_id() throws Exception {
-        Employee employee = employeeRepository.save(getEmployeeBob());
+        EmployeeRequest employeeRequest = new EmployeeRequest("Bob", 30, "Male", 6000, null);
 
-        mockMvc.perform(get("/employees/{id}", employee.getId()))
+        ObjectMapper objectMapper = new ObjectMapper();
+        String employeeRequestJSON = objectMapper.writeValueAsString(employeeRequest);
+
+        String response = mockMvc.perform(post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(employeeRequestJSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long createdId = Long.parseLong(JsonPath.read(response, "$.id").toString());
+
+        mockMvc.perform(get("/employees/{id}", createdId))
                 .andExpect(MockMvcResultMatchers.status().is(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(employee.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(employee.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(employee.getAge()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.gender").value(employee.getGender()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.salary").value(employee.getSalary()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(employeeRequest.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(employeeRequest.getAge()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.gender").value(employeeRequest.getGender()));
+
     }
 
     @Test
