@@ -34,12 +34,6 @@ public class EmployeeService {
         return EmployeeMapper.toResponse(employee);
     }
 
-//    public EmployeeResponse create(EmployeeRequest employeeRequest) {
-//        Employee employee = EmployeeMapper.toEntity(employeeRequest);
-//        return EmployeeMapper.toResponse(employeeRepository.save(employee));
-//
-//    }
-
     public void update(Long id, EmployeeRequest employeeRequest) {
         Employee toBeUpdatedEmployee = employeeRepository.findById(id)
                 .orElseThrow(EmployeeNotFoundException::new);
