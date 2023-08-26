@@ -1,8 +1,10 @@
 package com.afs.restapi;
 
 import com.afs.restapi.dto.CompanyRequest;
+import com.afs.restapi.dto.CompanyResponse;
 import com.afs.restapi.entity.Company;
 import com.afs.restapi.entity.Employee;
+import com.afs.restapi.mapper.CompanyMapper;
 import com.afs.restapi.repository.CompanyRepository;
 import com.afs.restapi.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,19 +78,23 @@ class CompanyApiTest {
     @Test
     void should_update_company_name() throws Exception {
         Company previousCompany = companyRepository.save(new Company(null, "OOCL"));
-        Company companyUpdateRequest = new Company(previousCompany.getId(), "ThoughtWorks");
+        CompanyRequest companyUpdateRequest = new CompanyRequest("ThoughtWorks");
+
         ObjectMapper objectMapper = new ObjectMapper();
-        String updatedEmployeeJson = objectMapper.writeValueAsString(companyUpdateRequest);
+        String updatedCompanyJson = objectMapper.writeValueAsString(companyUpdateRequest);
+
         mockMvc.perform(put("/companies/{id}", previousCompany.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedEmployeeJson))
+                        .content(updatedCompanyJson))
                 .andExpect(MockMvcResultMatchers.status().is(204));
 
         Optional<Company> optionalCompany = companyRepository.findById(previousCompany.getId());
         assertTrue(optionalCompany.isPresent());
         Company updatedCompany = optionalCompany.get();
-        Assertions.assertEquals(previousCompany.getId(), updatedCompany.getId());
-        Assertions.assertEquals(companyUpdateRequest.getName(), updatedCompany.getName());
+
+        CompanyResponse expectedCompanyResponse = CompanyMapper.toResponse(updatedCompany);
+        Assertions.assertEquals(expectedCompanyResponse.getId(), updatedCompany.getId());
+        Assertions.assertEquals(expectedCompanyResponse.getName(), updatedCompany.getName());
     }
 
     @Test

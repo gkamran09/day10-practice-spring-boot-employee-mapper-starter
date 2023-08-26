@@ -39,10 +39,13 @@ public class CompanyService {
                 .collect(Collectors.toList());
     }
 
-    public void update(Long id, Company company) {
+    public void update(Long id, CompanyRequest companyRequest) {
         Company toBeUpdatedCompany = companyRepository.findById(id)
                 .orElseThrow(CompanyNotFoundException::new);
-        toBeUpdatedCompany.setName(company.getName());
+
+        Company updatedCompany = CompanyMapper.toEntity(companyRequest);
+        toBeUpdatedCompany.setName(updatedCompany.getName());
+
         companyRepository.save(toBeUpdatedCompany);
     }
 
