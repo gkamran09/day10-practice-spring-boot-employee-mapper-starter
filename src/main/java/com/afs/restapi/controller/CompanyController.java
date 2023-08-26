@@ -33,8 +33,7 @@ public class CompanyController {
 
     @GetMapping("/{id}")
     public CompanyResponse getCompanyById(@PathVariable Long id) {
-        Company company = companyService.findById(id);
-        return CompanyMapper.toResponse(company);
+        return companyService.findById(id);
     }
 
     @PutMapping("/{id}")

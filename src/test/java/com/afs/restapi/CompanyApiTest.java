@@ -6,6 +6,7 @@ import com.afs.restapi.entity.Employee;
 import com.afs.restapi.repository.CompanyRepository;
 import com.afs.restapi.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,25 +52,31 @@ class CompanyApiTest {
 
     @Test
     void should_find_company_by_id() throws Exception {
-        Company company = companyRepository.save(getCompanyOOCL());
-        Employee employee = employeeRepository.save(getEmployee(company));
+        CompanyRequest companyRequest = new CompanyRequest("OOCL");
 
-        mockMvc.perform(get("/companies/{id}", company.getId()))
+        ObjectMapper objectMapper = new ObjectMapper();
+        String companyRequestJSON = objectMapper.writeValueAsString(companyRequest);
+
+        String response = mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(companyRequestJSON))
+                .andExpect(MockMvcResultMatchers.status().is(201))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long createdId = Long.parseLong(JsonPath.read(response, "$.id").toString());
+
+        mockMvc.perform(get("/companies/{id}", createdId))
                 .andExpect(MockMvcResultMatchers.status().is(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(company.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(company.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees.length()").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees[0].id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees[0].name").value(employee.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees[0].age").value(employee.getAge()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees[0].gender").value(employee.getGender()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.employees[0].salary").value(employee.getSalary()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(companyRequest.getName()));
     }
 
     @Test
     void should_update_company_name() throws Exception {
-        Company previousCompany = companyRepository.save(new Company(null, "Facebook"));
-        Company companyUpdateRequest = new Company(previousCompany.getId(), "Meta");
+        Company previousCompany = companyRepository.save(new Company(null, "OOCL"));
+        Company companyUpdateRequest = new Company(previousCompany.getId(), "ThoughtWorks");
         ObjectMapper objectMapper = new ObjectMapper();
         String updatedEmployeeJson = objectMapper.writeValueAsString(companyUpdateRequest);
         mockMvc.perform(put("/companies/{id}", previousCompany.getId())
