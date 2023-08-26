@@ -27,8 +27,7 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public EmployeeResponse getEmployeeById(@PathVariable Long id) {
-        Employee employee = employeeService.findById(id);
-        return EmployeeMapper.toResponse(employee);
+        return employeeService.findById(id);
     }
 
     @PutMapping("/{id}")

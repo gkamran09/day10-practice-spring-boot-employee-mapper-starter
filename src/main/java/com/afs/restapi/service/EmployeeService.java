@@ -1,9 +1,12 @@
 package com.afs.restapi.service;
 
+import com.afs.restapi.dto.CompanyRequest;
 import com.afs.restapi.dto.EmployeeRequest;
 import com.afs.restapi.dto.EmployeeResponse;
+import com.afs.restapi.entity.Company;
 import com.afs.restapi.entity.Employee;
 import com.afs.restapi.exception.EmployeeNotFoundException;
+import com.afs.restapi.mapper.CompanyMapper;
 import com.afs.restapi.mapper.EmployeeMapper;
 import com.afs.restapi.repository.EmployeeRepository;
 import org.springframework.data.domain.Page;
@@ -25,10 +28,17 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public Employee findById(Long id) {
-        return employeeRepository.findById(id)
+    public EmployeeResponse findById(Long id) {
+        Employee employee = employeeRepository.findById(id)
                 .orElseThrow(EmployeeNotFoundException::new);
+        return EmployeeMapper.toResponse(employee);
     }
+
+//    public EmployeeResponse create(EmployeeRequest employeeRequest) {
+//        Employee employee = EmployeeMapper.toEntity(employeeRequest);
+//        return EmployeeMapper.toResponse(employeeRepository.save(employee));
+//
+//    }
 
     public void update(Long id, EmployeeRequest employeeRequest) {
         Employee toBeUpdatedEmployee = employeeRepository.findById(id)
